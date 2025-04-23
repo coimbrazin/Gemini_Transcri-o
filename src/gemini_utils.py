@@ -1,23 +1,15 @@
 import google.generativeai as genai
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def configure_gemini():
-  """Configura a API Gemini com a chave da API."""
-  api_key = os.getenv("GEMINI_API_KEY")
-  if not api_key:
-    raise ValueError("A chave da API Gemini não foi encontrada na variável de ambiente GEMINI_API_KEY.")
-  
-  genai.configure(api_key=api_key)
+    genai.configure(api_key="AIzaSyALDB8gw3k0_AU7eKfuLVDtDSrlH_rHB6g")  # Substitua pela sua API KEY
 
-def generate_summary(text, prompt="Gere um resumo conciso do texto a seguir:"):
-  """Gera um resumo do texto usando a API Gemini."""
-  try:
-    model = genai.GenerativeModel('gemini-2.0-flash')
-    response = model.generate_content(prompt + "\n" + text)
-    return response.text
-  except Exception as e:
-    print(f"Erro ao gerar o resumo: {e}")
-    return None
+def generate_summary(text):
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    response = model.generate_content(f"Resuma o seguinte texto: {text}")
+    return response.text.strip()
+
+def translate_text(text, language):
+    prompt = f"Traduza o seguinte texto para {language}:\n\n{text}"
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    response = model.generate_content(prompt)
+    return response.text.strip()

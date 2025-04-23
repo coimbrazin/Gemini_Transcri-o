@@ -3,10 +3,8 @@ import youtube_utils
 import gemini_utils
 
 def main():
-    # Configurações da página
-    st.set_page_config(page_title="Resumo de Vídeos YouTube com Gemini", page_icon="🎬", layout="centered")
+    st.set_page_config(page_title="Resumo de Vídeos YouTube com Gemini", page_icon="🎮", layout="centered")
 
-    # Estilo com gradiente Flare + input + botão com efeito pulsante
     st.markdown(
         """
         <style>
@@ -28,40 +26,21 @@ def main():
                 color: black;
                 border-radius: 12px;
                 padding: 0.5em 1.2em;
-                border: 2px solid #f5af19;
-                font-weight: bold;
-                position: relative;
-                overflow: hidden;
-                z-index: 1;
+                border: none;
                 transition: all 0.3s ease;
+                font-weight: bold;
             }
             .stButton>button:hover {
                 background-color: #000000;
                 transform: scale(1.03);
                 box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-                border: 2px solid #fff;
-            }
-            .stButton>button::before {
-                content: "";
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-                animation: pulse 2s infinite;
-                z-index: 0;
-            }
-            @keyframes pulse {
-                0% { transform: scale(0.9); opacity: 1; }
-                100% { transform: scale(1.3); opacity: 0; }
+                border: 1px solid #333;
             }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-    # Cabeçalho
     st.markdown("""
         <div style='text-align: center; padding: 10px;'>
             <h1>🎥 YouTube Transcript Summarizer do ZeroZero</h1>
@@ -71,8 +50,7 @@ def main():
 
     st.markdown("---")
 
-    # Entrada da URL
-    video_url = st.text_input("📎 Insira a URL do vídeo do YouTube:", "https://youtu.be/Ys7-6_t7OEQ?feature=shared")
+    video_url = st.text_input("📌 Insira a URL do vídeo do YouTube:", "https://youtu.be/Ys7-6_t7OEQ?feature=shared")
 
     if video_url:
         try:
@@ -81,7 +59,7 @@ def main():
             transcript = youtube_utils.get_transcript(video_id)
 
             if video_title:
-                st.success(f"🎬 Título do Vídeo: {video_title}")
+                st.success(f"🎮 Título do Vídeo: {video_title}")
 
             if transcript:
                 with st.expander("📄 Ver Transcrição Completa"):
@@ -113,6 +91,34 @@ def main():
                         """, unsafe_allow_html=True)
                     else:
                         st.error("⚠️ Falha ao gerar resumo com coimbrazin AI")
+
+                st.markdown("---")
+
+                translation_language = st.selectbox("🌐 Selecione o idioma para traduzir a transcrição:", ["Português", "Francês"])
+
+                if st.button("🌍 Traduzir Transcrição"):
+                    with st.spinner("Traduzindo a transcrição com coimbrazin AI..."):
+                        translated = gemini_utils.translate_text(transcript, translation_language)
+                        if translated:
+                            st.markdown("## 🌐 Transcrição Traduzida:")
+                            st.markdown(f"""
+                                <div style='
+                                    background: rgba(255, 255, 255, 0.15);
+                                    border-radius: 16px;
+                                    padding: 20px;
+                                    color: white;
+                                    font-size: 16px;
+                                    line-height: 1.6;
+                                    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+                                    backdrop-filter: blur(8px);
+                                    -webkit-backdrop-filter: blur(8px);
+                                    border: 1px solid rgba(255, 255, 255, 0.18);
+                                '>
+                                    {translated}
+                                </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.error("❌ Falha ao traduzir a transcrição.")
             else:
                 st.error("😕 Não foi possível obter a transcrição do vídeo.")
 
